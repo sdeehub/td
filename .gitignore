@@ -1,0 +1,14 @@
+# dependencies installed by npm
+node_modules
+
+# build artifacts
+_site
+
+# cache
+.cache
+
+# temp
+_temp
+
+# emacs backup
+*~

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include "components/head.njk" %}
+  
+<body>
+<!-- Timeline 6 - Bootstrap Brain Component -->
+<section class="bsb-timeline-6 py-3 py-md-5 py-xl-8">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
+
+        <ul class="timeline">
+          <li class="timeline-item right">
+            <div class="timeline-body">
+              <div class="timeline-content">
+                <div class="card border-0">
+				  <img class="card-img-top img-fluid" loading="lazy" src="{{ image }}" alt="{{ icaption }}">
+				  <div class="card-body border border-top-0 border-light-subtle">
+                    <h2 class="card-title mb-2">{{ title }}</h2>
+					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ icaption }}</h6>
+					<p class="card-text mb-2">
+						
+                      {{ content | safe }}
+
+					</p>
+					<figure class="text-center">
+					  <blockquote class="blockquote">
+						<p>{{ quote }}</p>
+					  </blockquote>
+					  <figcaption class="blockquote-footer">
+						{{ qcaption }} <cite title="Source Title">, {{ cite }}</cite>
+					  </figcaption>
+					</figure>
+					{% set dateString = page.date.toDateString() %}
+					{% set timeString = page.date.toLocaleTimeString('en-US', { hour12: true}) %}
+                    <div class="card-footer">
+					  <small>{{ dateString }} {{ timeString }}</small><br>
+					  {% for tag in tags | sort %}
+					  <a href="https://www.quora.com"><span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
+					  {% endfor %}
+					</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

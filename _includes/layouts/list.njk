@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  {% include "components/head.njk" %}
+  
+<body>
+<!-- Timeline 6 - Bootstrap Brain Component -->
+<section class="bsb-timeline-6 py-3 py-md-5 py-xl-8">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
+		{% set zigzag = "left" %}
+        <ul class="timeline">
+		  {% for post in collections[target] | reverse %}
+
+		  {% set postDate = post.date.toDateString() %}
+		  {% set postTime = post.date.toLocaleTimeString('en-US', { hour12: true}) %}
+          <li class="timeline-item {{ zigzag }}">
+            <div class="timeline-body">
+              <div class="timeline-content">
+                <div class="card border-0">
+				  <img class="card-img-top img-fluid" loading="lazy" src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
+				  <div class="card-body border border-top-0 border-light-subtle">
+                    <h2 class="card-title mb-2">{{ post.data.title }}</h2>
+					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}{% if (post.data.icaption) %}, (รูป: {{ post.data.icaption }}){% endif %}</h6>
+					<p class="card-text mb-2">
+						
+                      {{ post.content | safe }}
+
+					</p>
+					<figure class="text-center">
+					  <blockquote class="blockquote">
+						<p>{{ post.data.quote }}</p>
+					  </blockquote>
+					  <figcaption class="blockquote-footer">
+						{{ post.data.qcaption }}<cite title="Source Title">{% if (post.data.cite) %}, {{ post.data.cite }}{% endif %}</cite>
+					  </figcaption>
+					</figure>
+                    <div class="card-footer">
+					  <small>{{ postDate }} {{ postTime }}</small><br>
+					  {% for tag in post.data.tags | sort %}
+					  {% if tag != "post" %}
+					  <a href="https://www.quora.com"><span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
+					  {% endif %}
+					  {% endfor %} <!-- tags -->
+					</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+		  {% if zigzag == "left" %}
+		  {% set zigzag = "right" %}
+		  {% else %}
+		  {% set zigzag = "left" %}
+		  {% endif %}
+		  {% endfor %} <!-- collections -->
+        </ul>
+
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
