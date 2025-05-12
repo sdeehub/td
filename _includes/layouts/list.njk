@@ -40,7 +40,7 @@
 					  <small>{{ postDate }} {{ postTime }}</small><br>
 					  {% for tag in post.data.tags | sort %}
 					  {% if tag != "post" %}
-					  <a href="https://www.quora.com"><span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
+					  <a href="https://sdeehub.github.io/td/posts/list_{{ tag | url }}"><span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
 					  {% endif %}
 					  {% endfor %} <!-- tags -->
 					</div>
