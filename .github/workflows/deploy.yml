@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main  # Deploy when changes are pushed to the 'main' branch
-
 jobs:
   build:
     runs-on: ubuntu-latest
-	env:
-	  TZ: Asia/Bangkok
+    env:
+      TZ: Asia/Bangkok
 
     steps:
       - name: Checkout the repository
@@ -40,3 +39,4 @@ jobs:
     steps:
       - name: Deploy
         uses: actions/deploy-pages@v4
+
