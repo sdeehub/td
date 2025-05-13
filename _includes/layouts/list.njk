@@ -39,14 +39,7 @@
                     <div class="card-footer">
 					  <small>{{ postDate }} {{ postTime }}</small><br>
 					  {% for tag in post.data.tags | sort %}
-					  {% if tag != "post" %}
-					  <a href="https://sdeehub.github.io/td/posts/list_{{ tag | url }}">
-						{% if tag == "sdee" %}
-						<span class="badge rounded-pill bg-secondary text-capitalize">S'DEE</span></a>
-					    {% else %}
-					    <span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
-                        {% endif %}
-					  {% endif %}
+					  {% include "components/tags.njk" %}
 					  {% endfor %} <!-- tags -->
 					</div>
                   </div>

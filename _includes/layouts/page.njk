@@ -37,7 +37,7 @@
                     <div class="card-footer">
 					  <small>{{ dateString }} {{ timeString }}</small><br>
 					  {% for tag in tags | sort %}
-					  <a href="https://www.quora.com"><span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
+					  {% include "components/tags.njk" %}
 					  {% endfor %}
 					</div>
                   </div>
