@@ -8,10 +8,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@11ty/eleventy": "^3.0.0",
+    "@11ty/eleventy": "^3.1.0",
     "markdown-it": "^14.1.0",
     "markdown-it-implicit-figures": "^0.12.0"
-  }
+  },
+  "description": ""
 }
