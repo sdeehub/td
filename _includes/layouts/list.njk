@@ -21,8 +21,9 @@
                 <div class="card border-0">
 				  <img class="card-img-top img-fluid" loading="lazy" src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
 				  <div class="card-body border border-top-0 border-light-subtle">
+					<small class="text-muted text-right"><i>{% if (post.data.icaption) %}รูป: {{ post.data.icaption }}{% endif %}</i></small>
                     <h2 class="card-title mb-2">{{ post.data.title }}</h2>
-					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}{% if (post.data.icaption) %}, (รูป: {{ post.data.icaption }}){% endif %}</h6>
+					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}</h6>
 					<p class="card-text mb-2">
 						
                       {{ post.content | safe }}

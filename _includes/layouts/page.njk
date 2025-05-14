@@ -17,8 +17,9 @@
                 <div class="card border-0">
 				  <img class="card-img-top img-fluid" loading="lazy" src="{{ image }}" alt="{{ icaption }}">
 				  <div class="card-body border border-top-0 border-light-subtle">
+					<small class="text-muted text-right"><i>{% if (icaption) %}รูป: {{ icaption }}{% endif %}</i></small>
                     <h2 class="card-title mb-2">{{ title }}</h2>
-					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ icaption }}</h6>
+					<h6 class="card-subtitle mb-2 text-secondary mb-3">{{ subtitle }}</h6>
 					<p class="card-text mb-2">
 						
                       {{ content | safe }}
@@ -29,13 +30,13 @@
 						<p>{{ quote }}</p>
 					  </blockquote>
 					  <figcaption class="blockquote-footer">
-						{{ qcaption }} <cite title="Source Title">, {{ cite }}</cite>
+						{{ qcaption }} <cite title="Source Title">{% if (cite) %}, {{ cite }}{% endif %}</cite>
 					  </figcaption>
 					</figure>
-					{% set dateString = page.date.toDateString() %}
-					{% set timeString = page.date.toLocaleTimeString('en-US', { hour12: true}) %}
+					{% set postDate = page.date.toDateString() %}
+					{% set postTime = page.date.toLocaleTimeString('en-US', { hour12: true}) %}
                     <div class="card-footer">
-					  <small>{{ dateString }} {{ timeString }}</small><br>
+					  <small>{{ postDate }} {{ postTime }}</small><br>
 					  {% for tag in tags | sort %}
 					  {% include "components/tags.njk" %}
 					  {% endfor %}
