@@ -2,13 +2,17 @@
 {% if tag != "post" %}
    <a href="https://sdeehub.github.io/td/posts/list_{{ tag | url }}">
    {% if tag == "sdee" %}
-   <span class="badge rounded-pill bg-secondary text-capitalize">S'DEE</span></a>
+   <span class="badge rounded-pill bg-secondary">S'DEE</span></a>
    {% elif tag == "jp" %}
-   <span class="badge rounded-pill bg-secondary text-capitalize">JP</span></a>
+   <span class="badge rounded-pill bg-secondary">JP</span></a>
    {% elif tag == "my" %}
-   <span class="badge rounded-pill bg-secondary text-capitalize">MY</span></a>
+   <span class="badge rounded-pill bg-secondary">MY</span></a>
    {% elif tag == "th" %}
-   <span class="badge rounded-pill bg-secondary text-capitalize">TH</span></a>
+   <span class="badge rounded-pill bg-secondary">TH</span></a>
+   {% elif tag == "nxtstp" %}
+   <span class="badge rounded-pill bg-secondary">NxtStp</span></a>
+   {% elif tag == "viaflow" %}
+   <span class="badge rounded-pill bg-secondary">ViaFlow</span></a>
    {% else %}
    <span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
    {% endif %}
