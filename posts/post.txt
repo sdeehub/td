@@ -1,6 +1,6 @@
 ---
 layout: layouts/page.njk
-date: Last Modified
+date: Created
 title: 
 subtitle: 
 image: https://picsum.photos/400 #square-width/height
