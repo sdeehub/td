@@ -18,6 +18,7 @@ tags:
 # - date #show posts on this date
 # - jp
 # - life
+# - movie
 # - my
 # - nxtstp
 # - sdee
