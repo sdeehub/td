@@ -1,5 +1,5 @@
 ---
-layout: layouts/list.njk
+layout: layouts/list-item.njk
 target: 
 sort: normal
 ---
