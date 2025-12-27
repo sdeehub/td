@@ -15,6 +15,8 @@
    <span class="badge rounded-pill bg-secondary">ViaFlow</span></a>
    {% elif tag == "selfimprovement" %}
    <span class="badge rounded-pill bg-secondary">Self-Improvement</span></a>
+   {% elif tag.startsWith("isbn") %}
+   <span class="badge rounded-pill bg-secondary">ISBN {{ tag.replace("isbn_", "") }}</span></a>
    {% else %}
    <span class="badge rounded-pill bg-secondary text-capitalize">{{ tag }}</span></a>
    {% endif %}

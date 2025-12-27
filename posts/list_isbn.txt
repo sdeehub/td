@@ -1,5 +1,5 @@
 ---
 layout: layouts/list.njk
-target: coding
-sort: reverse
+target: 
+sort: normal
 ---
