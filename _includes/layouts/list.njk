@@ -17,6 +17,7 @@
               {% set sortedCollection = collections[target] | reverse %}
             {% endif %}
             {% for post in sortedCollection %}
+	      {% if 'post' in post.data.tags %}
 
               {% set postDate = post.date.toDateString() %}
               {% set postTime = post.date.toLocaleTimeString('en-US', { hour12: true}) %}
@@ -51,12 +52,15 @@
                   </div>
                 </div>
               </li>
-              {% if zigzag == "left" %}
+
+	      {% if zigzag == "left" %}
                 {% set zigzag = "right" %}
               {% else %}
                 {% set zigzag = "left" %}
               {% endif %}
-            {% endfor %} <!-- collections -->
+
+	      {% endif %} <!-- filter post.data.tags -->
+            {% endfor %} <!-- sortedCollections -->
           </ul>
 
         </div>
