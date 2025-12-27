@@ -13,18 +13,18 @@ cite:
 tags: 
  - post
 # - abundance
-# - book
+# - books
 # - coding
 # - date #show posts on this date
 # - jp
 # - life
-# - movie
+# - movies
 # - my
 # - nxtstp
 # - sdee
 # - selfimprovement
 # - th
-# - tool
+# - tools
 # - viaflow
 ---
 
