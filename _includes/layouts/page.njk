@@ -39,7 +39,7 @@
 					</p>
 					<figure class="text-center">
 					  <blockquote class="blockquote">
-						<p>{{ quote }}</p>
+						<p>{{ quote | safe }}</p>
 					  </blockquote>
 					  <figcaption class="blockquote-footer">
 						{{ qcaption }} <cite title="Source Title">{% if (cite) %}, {{ cite }}{% endif %}</cite>
