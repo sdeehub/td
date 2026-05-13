@@ -24,6 +24,8 @@ jobs:
 
       - name: Build the site
         run: npx @11ty/eleventy
+        env:
+          ELEVENTY_ENV: production
 
       - name: Deploy to GitHub Pages
         uses: actions/upload-pages-artifact@v3

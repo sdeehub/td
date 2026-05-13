@@ -87,5 +87,6 @@ module.exports = function (eleventyConfig) {
       output: "_site",
     },
     markdownTemplateEngine: "njk", // ✅ Enables Nunjucks in .md
+    pathPrefix: process.env.ELEVENTY_ENV === "production" ? "/td/" : "/", // ← added
   };
 };
