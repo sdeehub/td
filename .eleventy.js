@@ -8,9 +8,16 @@ module.exports = function (eleventyConfig) {
     const posts = collectionApi.getFilteredByTag("post").reverse();
 
     const seenTags = new Set();
-    const uniquePosts = [];
     const seenPosts = new Set();
+    const uniquePosts = [];
 
+    function isInternalTag(tag) {
+      return (
+        ["post", "all", "nav"].includes(tag) ||
+        tag.startsWith("isbn_")
+      );
+    }
+    
     for (const post of posts) {
 
       const tags = post.data.tags || [];
@@ -20,7 +27,7 @@ module.exports = function (eleventyConfig) {
       for (const tag of tags) {
 
 	// skip internal/common tags
-	if (tag === "post" || tag === "all") {
+	  if (isInternalTag(tag)) {
 	  continue;
 	}
 
