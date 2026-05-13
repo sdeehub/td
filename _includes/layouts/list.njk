@@ -11,7 +11,21 @@
         <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
           {% set zigzag = "left" %}
           <ul class="timeline">
-	    {% set sortedCollection = collections.latestPerTag %}
+	    
+	    {% if collection %}
+	    
+	      {% set sortedCollection = collections[collection] %}
+
+	    {% else %}
+	    
+	      {% if sort == "normal" %}
+                {% set sortedCollection = collections[target] %}
+              {% else %}
+                {% set sortedCollection = collections[target] | reverse %}
+              {% endif %}
+
+	    {% endif %}
+	    
             {% for post in sortedCollection %}
 
               {% set postDate = post.date.toDateString() %}
