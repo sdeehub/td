@@ -9,6 +9,16 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
+
+	  <!-- Home dot at top of timeline -->
+          <div style="position:relative; height:20px; margin-bottom:-10px;">
+            <a href="/" class="tl-dot" aria-label="Home">
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:4px;left:4px;">
+                <path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2z"/>
+              </svg>
+            </a>
+          </div>
+	  
           {% set zigzag = "left" %}
           <ul class="timeline">
 	    
@@ -71,10 +81,48 @@
             {% endfor %} <!-- sortedCollections -->
           </ul>
 
+          <!-- Back to top dot at end of timeline -->
+          <div style="position:relative; height:20px; margin-top:-10px;">
+            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="tl-dot" aria-label="Back to top">
+	      <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:3px;left:4px;">
+		<path d="M8 3 L14 13 L2 13 Z"/>
+	      </svg>
+            </a>
+          </div>
+
         </div>
       </div>
     </div>
   </section>
+
+  <style>
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(220,53,69,0.4); }
+      70%  { box-shadow: 0 0 0 8px rgba(220,53,69,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,53,69,0); }
+    }
+    .tl-dot {
+      display: block;
+      position: absolute;
+      left: -9px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bs-danger);
+      z-index: 2;
+      cursor: pointer;
+      transition: transform .2s, opacity .2s;
+      animation: pulse 2s infinite;
+    }
+    .tl-dot:hover {
+      opacity: .75;
+      transform: scale(1.25);
+      animation: none;
+    }
+    @media (min-width: 768px) {
+      .tl-dot { left: calc(50% - 9px); }
+    }
+  </style>
 </body>
 
 </html>
