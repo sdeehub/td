@@ -2,6 +2,45 @@ const markdownIt = require("markdown-it");
 const implicitFigures = require("markdown-it-implicit-figures");
 
 module.exports = function (eleventyConfig) {
+
+  eleventyConfig.addCollection("latestPerTag", function(collectionApi) {
+    // all posts sorted newest first
+    const posts = collectionApi.getFilteredByTag("post").reverse();
+
+    const seenTags = new Set();
+    const uniquePosts = [];
+    const seenPosts = new Set();
+
+    for (const post of posts) {
+
+      const tags = post.data.tags || [];
+
+      let matchedNewTag = false;
+
+      for (const tag of tags) {
+
+	// skip internal/common tags
+	if (tag === "post" || tag === "all") {
+	  continue;
+	}
+
+	// first time seeing this tag
+	if (!seenTags.has(tag)) {
+	  seenTags.add(tag);
+	  matchedNewTag = true;
+	}
+      }
+
+      // add post only once total
+      if (matchedNewTag && !seenPosts.has(post.url)) {
+	seenPosts.add(post.url);
+	uniquePosts.push(post);
+      }
+    }
+
+    return uniquePosts;
+  });
+
   // Shortcode: Left-aligned quote
   eleventyConfig.addPairedShortcode("quote", function(content, caption) {
     return `
