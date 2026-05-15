@@ -3,11 +3,17 @@ const implicitFigures = require("markdown-it-implicit-figures");
 
 module.exports = function (eleventyConfig) {
 
-  eleventyConfig.addCollection("latestPerTag", function(collectionApi) {
-    // all posts sorted newest first
-    const posts = collectionApi.getFilteredByTag("post").reverse();
+  eleventyConfig.addFilter("pad2", n => String(n).padStart(2, "0"));
+    
+  // ── Date filters for timeline filtering ──────────────────────────────────
+  eleventyConfig.addFilter("getYear",  d => d instanceof Date ? d.getFullYear().toString() : "");
+  eleventyConfig.addFilter("getMonth", d => d instanceof Date ? String(d.getMonth() + 1).padStart(2, "0") : "");
+  eleventyConfig.addFilter("getDay",   d => d instanceof Date ? String(d.getDate()).padStart(2, "0") : "");
 
-    const seenTags = new Set();
+  // ── Collections ──────────────────────────────────────────────────────────
+  eleventyConfig.addCollection("latestPerTag", function(collectionApi) {
+    const posts = collectionApi.getFilteredByTag("post").reverse();
+    const seenTags  = new Set();
     const seenPosts = new Set();
     const uniquePosts = [];
 
@@ -17,38 +23,28 @@ module.exports = function (eleventyConfig) {
         tag.startsWith("isbn_")
       );
     }
-    
+
     for (const post of posts) {
-
       const tags = post.data.tags || [];
-
       let matchedNewTag = false;
-
       for (const tag of tags) {
-
-	// skip internal/common tags
-	  if (isInternalTag(tag)) {
-	  continue;
-	}
-
-	// first time seeing this tag
-	if (!seenTags.has(tag)) {
-	  seenTags.add(tag);
-	  matchedNewTag = true;
-	}
+        if (isInternalTag(tag)) continue;
+        if (!seenTags.has(tag)) {
+          seenTags.add(tag);
+          matchedNewTag = true;
+        }
       }
-
-      // add post only once total
       if (matchedNewTag && !seenPosts.has(post.url)) {
-	seenPosts.add(post.url);
-	uniquePosts.push(post);
+        seenPosts.add(post.url);
+        uniquePosts.push(post);
       }
     }
-
     return uniquePosts;
   });
 
-  // Shortcode: Left-aligned quote
+  // ── Shortcodes ───────────────────────────────────────────────────────────
+
+  // Left-aligned quote
   eleventyConfig.addPairedShortcode("quote", function(content, caption) {
     return `
 <figure class="blockquote">
@@ -59,7 +55,7 @@ module.exports = function (eleventyConfig) {
 </figure>`;
   });
 
-  // Shortcode: Right-aligned quote
+  // Right-aligned quote
   eleventyConfig.addPairedShortcode("quoteEnd", function(content, caption) {
     return `
 <figure class="blockquote text-end">
@@ -70,23 +66,22 @@ module.exports = function (eleventyConfig) {
 </figure>`;
   });
 
-  // Custom Markdown engine with figure support
+  // ── Markdown engine ──────────────────────────────────────────────────────
   const markdownLib = markdownIt({ html: true, breaks: true, linkify: true })
     .use(implicitFigures, {
       figcaption: true,
       figcaptionClassName: "figure-caption",
     });
-
   eleventyConfig.setLibrary("md", markdownLib);
 
-  // Return config object (this is where defaults go in v2)
+  // ── Config ───────────────────────────────────────────────────────────────
   return {
     dir: {
       input: ".",
       includes: "_includes",
       output: "_site",
     },
-    markdownTemplateEngine: "njk", // ✅ Enables Nunjucks in .md
-    pathPrefix: process.env.ELEVENTY_ENV === "production" ? "/td/" : "/", // ← added
+    markdownTemplateEngine: "njk",
+    pathPrefix: process.env.ELEVENTY_ENV === "production" ? "/td/" : "/",
   };
 };

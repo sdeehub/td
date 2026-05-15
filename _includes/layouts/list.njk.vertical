@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.njk" %}
+
+<body>
+  <section class="bsb-timeline-6 py-3 py-md-5 py-xl-8">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
+
+          {# ── Build sorted collection ── #}
+          {% if collection %}
+            {% set sortedCollection = collections[collection] %}
+          {% else %}
+            {% if sort == "normal" %}
+              {% set sortedCollection = collections[target] %}
+            {% else %}
+              {% set sortedCollection = collections[target] | reverse %}
+            {% endif %}
+          {% endif %}
+
+          {# ── Collect unique years for the year row (dynamic) ── #}
+          {% set years = [] %}
+          {% for post in sortedCollection %}
+            {% set y = post.date | getYear %}
+            {% if y not in years %}{% set years = (years.push(y), years) %}{% endif %}
+          {% endfor %}
+
+          {# ── Resolve tag display name (mirrors tags.njk logic) ── #}
+          {% set _tag = target or collection %}
+          {% if page.url == ("/" | url) %}
+            {% set pageLabel = "Latest" %}
+            {% set pageLabelClass = "tl-badge--latest" %}
+          {% elif _tag == "sdee" %}
+            {% set pageLabel = "S'DEE" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "jp" %}
+            {% set pageLabel = "JP" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "my" %}
+            {% set pageLabel = "MY" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "th" %}
+            {% set pageLabel = "TH" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "nxtstp" %}
+            {% set pageLabel = "NxtStp" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "viaflow" %}
+            {% set pageLabel = "ViaFlow" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "selfimprovement" %}
+            {% set pageLabel = "Self-Improvement" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag and _tag.startsWith("isbn_") %}
+            {% set pageLabel = "ISBN " + _tag.replace("isbn_", "") %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% else %}
+            {% set pageLabel = _tag %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% endif %}
+
+          {# ── Filter bar — vertical split ── #}
+          <div class="tl-filter-bar mb-4">
+            <div class="tl-split">
+
+              {# Left column: page label badge #}
+              <div class="tl-split__label">
+                <span class="tl-badge {{ pageLabelClass }}">{{ pageLabel }}</span>
+              </div>
+
+              {# Vertical rule #}
+              <div class="tl-split__rule"></div>
+
+              {# Right column: Year / Month / Day filters #}
+              <div class="tl-split__filters">
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Year</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-year="*">All</button>
+                    {% for y in years | sort %}
+                      <button class="tl-btn tl-btn--available" data-year="{{ y }}">{{ y }}</button>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Month</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-month="*">All</button>
+                    <button class="tl-btn tl-btn--available" data-month="01">Jan</button>
+                    <button class="tl-btn tl-btn--available" data-month="02">Feb</button>
+                    <button class="tl-btn tl-btn--available" data-month="03">Mar</button>
+                    <button class="tl-btn tl-btn--available" data-month="04">Apr</button>
+                    <button class="tl-btn tl-btn--available" data-month="05">May</button>
+                    <button class="tl-btn tl-btn--available" data-month="06">Jun</button>
+                    <button class="tl-btn tl-btn--available" data-month="07">Jul</button>
+                    <button class="tl-btn tl-btn--available" data-month="08">Aug</button>
+                    <button class="tl-btn tl-btn--available" data-month="09">Sep</button>
+                    <button class="tl-btn tl-btn--available" data-month="10">Oct</button>
+                    <button class="tl-btn tl-btn--available" data-month="11">Nov</button>
+                    <button class="tl-btn tl-btn--available" data-month="12">Dec</button>
+                  </div>
+                </div>
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Day</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-day="*">All</button>
+                    {% for n in range(1, 32) %}
+                      <button class="tl-btn tl-btn--available" data-day="{{ '%02d' % n }}">{{ n }}</button>
+                    {% endfor %}
+                  </div>
+                </div>
+
+              </div>{# /.tl-split__filters #}
+            </div>{# /.tl-split #}
+          </div>{# /.tl-filter-bar #}
+
+          <p class="tl-count mb-3" id="tl-count"></p>
+
+          {# ── Home dot ── #}
+          <div style="position:relative; height:20px; margin-bottom:-10px;">
+            <a href="{{ '/' | url }}" class="tl-dot tl-dot--pulse" aria-label="Home">
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:4px;left:4px;">
+                <path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2z"/>
+              </svg>
+            </a>
+          </div>
+
+          {% set zigzag = "left" %}
+          <ul class="timeline" id="tl-list">
+            {% for post in sortedCollection %}
+              {% set postDate  = post.date.toDateString() %}
+              {% set postTime  = post.date.toLocaleTimeString('en-US', { hour12: true }) %}
+              {% set postYear  = post.date | getYear %}
+              {% set postMonth = post.date | getMonth %}
+              {% set postDay   = post.date | getDay %}
+
+              <li class="timeline-item {{ zigzag }} tl-item"
+                  data-year="{{ postYear }}"
+                  data-month="{{ postMonth }}"
+                  data-day="{{ postDay }}">
+                <div class="timeline-body">
+                  <div class="timeline-content">
+                    <div class="card border-0">
+                      <img class="card-img-top img-fluid" loading="lazy"
+                           src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
+                      <div class="card-body border border-top-0 border-light-subtle">
+                        <small class="text-muted text-right">
+                          <i>{% if post.data.icaption %}รูป: {{ post.data.icaption }}{% endif %}</i>
+                        </small>
+                        <h2 class="card-title mb-2">{{ post.data.title }}</h2>
+                        <h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}</h6>
+                        <p class="card-text mb-2">{{ post.content | safe }}</p>
+                        <figure class="text-center">
+                          <blockquote class="blockquote">
+                            <p>{{ post.data.quote }}</p>
+                          </blockquote>
+                          <figcaption class="blockquote-footer">
+                            {{ post.data.qcaption }}
+                            <cite title="Source Title">{% if post.data.cite %}, {{ post.data.cite }}{% endif %}</cite>
+                          </figcaption>
+                        </figure>
+                        <div class="card-footer">
+                          <small>{{ postDate }} {{ postTime }}</small><br>
+                          {% for tag in post.data.tags | sort %}
+                            {% include "components/tags.njk" %}
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              {% if zigzag == "left" %}
+                {% set zigzag = "right" %}
+              {% else %}
+                {% set zigzag = "left" %}
+              {% endif %}
+
+            {% endfor %}
+          </ul>
+
+          {# ── No results message ── #}
+          <p class="tl-empty text-muted text-center py-4" id="tl-empty" style="display:none;">
+            No posts match this filter.
+          </p>
+
+          {# ── Back to top dot ── #}
+          <div style="position:relative; height:20px; margin-top:-10px;">
+            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"
+               class="tl-dot tl-dot--pulse" aria-label="Back to top">
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="white"
+                   style="position:absolute;top:3px;left:4px;">
+                <path d="M8 3 L14 13 L2 13 Z"/>
+              </svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    /* ══════════════════════════════════════════
+       Filter bar
+    ══════════════════════════════════════════ */
+    .tl-filter-bar {
+      background: var(--bs-body-bg);
+      border: 1px solid var(--bs-border-color);
+      border-radius: .75rem;
+      padding: .6rem .9rem;
+    }
+    .tl-split {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .tl-split__label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: .4rem .9rem .4rem .2rem;
+      flex-shrink: 0;
+    }
+    .tl-split__rule {
+      width: 1px;
+      background: var(--bs-border-color);
+      margin: .1rem .75rem .1rem 0;
+      flex-shrink: 0;
+    }
+    .tl-split__filters {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      padding: .4rem 0;
+    }
+    .tl-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    .tl-filter-label {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--bs-secondary-color);
+      min-width: 2.6rem;
+      flex-shrink: 0;
+    }
+    .tl-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    /* ══════════════════════════════════════════
+       Badge
+    ══════════════════════════════════════════ */
+    .tl-badge {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 99px;
+      line-height: 1.6;
+      letter-spacing: .03em;
+    }
+    .tl-badge--latest {
+      background: var(--bs-danger);
+      color: #fff;
+    }
+    .tl-badge--tag {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-secondary-color);
+      border: 1px solid var(--bs-border-color);
+    }
+
+    /* ══════════════════════════════════════════
+       Filter buttons
+    ══════════════════════════════════════════ */
+    .tl-btn {
+      font-size: .72rem;
+      padding: 2px 9px;
+      border-radius: 99px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s, opacity .12s;
+      line-height: 1.6;
+    }
+    .tl-btn--available {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-secondary-color);
+      border-color: var(--bs-border-color);
+    }
+    .tl-btn--available:hover {
+      background: var(--bs-tertiary-bg);
+      border-color: var(--bs-secondary-color);
+    }
+    .tl-btn--available.active {
+      background: var(--bs-secondary-color);
+      color: var(--bs-body-bg);
+      border-color: var(--bs-secondary-color);
+    }
+    .tl-btn--unavailable {
+      background: rgba(220, 53, 69, .08);
+      color: var(--bs-danger);
+      border-color: rgba(220, 53, 69, .25);
+      opacity: .55;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       Count + empty
+    ══════════════════════════════════════════ */
+    .tl-count {
+      font-size: .82rem;
+      color: var(--bs-secondary-color);
+    }
+
+    /* ══════════════════════════════════════════
+       Hidden items
+    ══════════════════════════════════════════ */
+    .tl-item { transition: opacity .2s; }
+    .tl-item.tl-hidden { display: none; }
+
+    /* ══════════════════════════════════════════
+       Timeline dots
+    ══════════════════════════════════════════ */
+    @keyframes tl-pulse {
+      0%   { box-shadow: 0 0 0 0   rgba(220,53,69,.45); }
+      70%  { box-shadow: 0 0 0 9px rgba(220,53,69,0);   }
+      100% { box-shadow: 0 0 0 0   rgba(220,53,69,0);   }
+    }
+    .tl-dot {
+      display: block;
+      position: absolute;
+      left: -9px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bs-danger);
+      z-index: 2;
+      transition: transform .2s, opacity .2s;
+    }
+    .tl-dot--pulse {
+      cursor: pointer;
+      animation: tl-pulse 2s ease-out infinite;
+    }
+    .tl-dot--pulse:hover {
+      opacity: .8;
+      transform: scale(1.25);
+      animation: none;
+    }
+    @media (min-width: 768px) {
+      .tl-dot { left: calc(50% - 9px); }
+    }
+  </style>
+
+  <script>
+    (function () {
+      let activeYear  = "*";
+      let activeMonth = "*";
+      let activeDay   = "*";
+
+      const items   = document.querySelectorAll(".tl-item");
+      const countEl = document.getElementById("tl-count");
+      const emptyEl = document.getElementById("tl-empty");
+      const total   = items.length;
+
+      function countIfSet(axis, value) {
+        let n = 0;
+        items.forEach(function (item) {
+          const y = axis === "year"  ? value : activeYear;
+          const m = axis === "month" ? value : activeMonth;
+          const d = axis === "day"   ? value : activeDay;
+          if (
+            (y === "*" || item.dataset.year  === y) &&
+            (m === "*" || item.dataset.month === m) &&
+            (d === "*" || item.dataset.day   === d)
+          ) n++;
+        });
+        return n;
+      }
+
+      function updateButtonAvailability() {
+        [
+          { sel: ".tl-btn[data-year]",  axis: "year"  },
+          { sel: ".tl-btn[data-month]", axis: "month" },
+          { sel: ".tl-btn[data-day]",   axis: "day"   },
+        ].forEach(function (group) {
+          document.querySelectorAll(group.sel).forEach(function (btn) {
+            const empty = countIfSet(group.axis, btn.dataset[group.axis]) === 0;
+            btn.disabled = empty;
+            if (empty) {
+              btn.classList.remove("tl-btn--available");
+              btn.classList.add("tl-btn--unavailable");
+            } else {
+              btn.classList.remove("tl-btn--unavailable");
+              btn.classList.add("tl-btn--available");
+            }
+          });
+        });
+      }
+
+      function updateCount(visible) {
+        countEl.textContent = visible === total
+          ? "Showing all " + total + " posts"
+          : "Showing " + visible + " of " + total + " posts";
+        emptyEl.style.display = visible === 0 ? "block" : "none";
+      }
+
+      function applyFilter() {
+        let visible = 0;
+        items.forEach(function (item) {
+          const show =
+            (activeYear  === "*" || item.dataset.year  === activeYear)  &&
+            (activeMonth === "*" || item.dataset.month === activeMonth) &&
+            (activeDay   === "*" || item.dataset.day   === activeDay);
+          item.classList.toggle("tl-hidden", !show);
+          if (show) visible++;
+        });
+        updateCount(visible);
+        updateButtonAvailability();
+      }
+
+      function bindGroup(selector, stateKey) {
+        document.querySelectorAll(selector).forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (this.disabled) return;
+            document.querySelectorAll(selector).forEach(function (b) {
+              b.classList.remove("active");
+            });
+            this.classList.add("active");
+            if (stateKey === "year")  activeYear  = this.dataset.year;
+            if (stateKey === "month") activeMonth = this.dataset.month;
+            if (stateKey === "day")   activeDay   = this.dataset.day;
+            applyFilter();
+          });
+        });
+      }
+
+      bindGroup("[data-year]",  "year");
+      bindGroup("[data-month]", "month");
+      bindGroup("[data-day]",   "day");
+
+      applyFilter();
+    })();
+  </script>
+
+</body>
+</html>
