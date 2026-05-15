@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% include "components/head.njk" %}
+
+<body>
+  <!-- Timeline 6 - Bootstrap Brain Component -->
+  <section class="bsb-timeline-6 py-3 py-md-5 py-xl-8">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
+
+	  <!-- Home dot at top of timeline -->
+          <div style="position:relative; height:20px; margin-bottom:-10px;">
+            <a href="{{ '/' | url }}" class="tl-dot" aria-label="Home">
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:4px;left:4px;">
+                <path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2z"/>
+              </svg>
+            </a>
+          </div>
+
+	  {# ── Date filter bar ── #}
+	  <div id="tl-filters" style="margin-bottom:1.5rem;"></div>
+	  
+          {% set zigzag = "left" %}
+          <ul class="timeline" id="tl-grid">
+	    
+	    {% if collection %}
+	    
+	      {% set sortedCollection = collections[collection] %}
+
+	    {% else %}
+	    
+	      {% if sort == "normal" %}
+                {% set sortedCollection = collections[target] %}
+              {% else %}
+                {% set sortedCollection = collections[target] | reverse %}
+              {% endif %}
+
+	    {% endif %}
+	    
+            {% for post in sortedCollection %}
+
+              {% set postDate = post.date.toDateString() %}
+              {% set postTime = post.date.toLocaleTimeString('en-US', { hour12: true}) %}
+
+	      {% set _y   = post.date.getFullYear() %}
+	      {% set _mmp = (post.date.getMonth() + 1) | pad2 %}
+	      {% set _ddp = post.date.getDate() | pad2 %}
+	      <li class="timeline-item {{ zigzag }} y-{{ _y }} m-{{ _mmp }} d-{{ _ddp }}"
+		  data-year="{{ _y }}"
+		  data-month="{{ _mmp }}"
+		  data-day="{{ _ddp }}">
+
+		<div class="timeline-body">
+                  <div class="timeline-content">
+                    <div class="card border-0">
+                      <img class="card-img-top img-fluid" loading="lazy" src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
+                      <div class="card-body border border-top-0 border-light-subtle">
+                        <small class="text-muted text-right"><i>{% if (post.data.icaption) %}รูป: {{ post.data.icaption }}{% endif %}</i></small>
+                        <h2 class="card-title mb-2">{{ post.data.title }}</h2>
+                        <h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}</h6>
+                        <p class="card-text mb-2">
+                          {{ post.content | safe }}
+                        </p>
+                        <figure class="text-center">
+                          <blockquote class="blockquote">
+                            <p>{{ post.data.quote }}</p>
+                          </blockquote>
+                          <figcaption class="blockquote-footer">
+                            {{ post.data.qcaption }}<cite title="Source Title">{% if (post.data.cite) %}, {{ post.data.cite }}{% endif %}</cite>
+                          </figcaption>
+                        </figure>
+                        <div class="card-footer">
+                          <small>{{ postDate }} {{ postTime }}</small><br>
+                          {% for tag in post.data.tags | sort %}
+                            {% include "components/tags.njk" %}
+                          {% endfor %} <!-- tags -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+	      {% if zigzag == "left" %}
+                {% set zigzag = "right" %}
+              {% else %}
+                {% set zigzag = "left" %}
+              {% endif %}
+
+            {% endfor %} <!-- sortedCollections -->
+          </ul>
+
+          <!-- Back to top dot at end of timeline -->
+          <div style="position:relative; height:20px; margin-top:-10px;">
+            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="tl-dot" aria-label="Back to top">
+	      <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:3px;left:4px;">
+		<path d="M8 3 L14 13 L2 13 Z"/>
+	      </svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(220,53,69,0.4); }
+      70%  { box-shadow: 0 0 0 8px rgba(220,53,69,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,53,69,0); }
+    }
+    .tl-dot {
+      display: block;
+      position: absolute;
+      left: -9px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bs-danger);
+      z-index: 2;
+      cursor: pointer;
+      transition: transform .2s, opacity .2s;
+      animation: pulse 2s infinite;
+    }
+    .tl-dot:hover {
+      opacity: .75;
+      transform: scale(1.25);
+      animation: none;
+    }
+    @media (min-width: 768px) {
+      .tl-dot { left: calc(50% - 9px); }
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/isotope-layout@3.0.6/dist/isotope.pkgd.min.js"></script>
+  <script>
+  window.addEventListener('load', function () {
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const items = Array.from(document.querySelectorAll('#tl-grid .timeline-item[data-year]'));
+    if (!items.length) return;
+
+
+    const allYears  = [...new Set(items.map(el => el.dataset.year))].sort();
+    const allMonths = [...new Set(items.map(el => el.dataset.month))].sort();
+    const allDays   = [...new Set(items.map(el => el.dataset.day))].sort();
+
+    let activeYear = '*', activeMonth = '*', activeDay = '*';
+
+    const iso = new Isotope('#tl-grid', {
+      itemSelector: '.timeline-item',
+      layoutMode: 'vertical'
+    });
+
+    const wrap = document.getElementById('tl-filters');
+
+    function makeRow(label) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px';
+      const lbl = document.createElement('span');
+      lbl.textContent = label;
+      lbl.style.cssText = 'font-size:11px;font-weight:600;min-width:46px;letter-spacing:.06em;opacity:.55;text-transform:uppercase';
+      const sep = document.createElement('div');
+      sep.style.cssText = 'width:1px;height:18px;background:rgba(128,128,128,.25);margin:0 2px';
+      const inner = document.createElement('div');
+      inner.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap';
+      row.append(lbl, sep, inner);
+      wrap.appendChild(row);
+      return inner;
+    }
+
+    function btn(text, small) {
+      const b = document.createElement('button');
+      b.textContent = text;
+      b.style.cssText = [
+        'border:.5px solid rgba(128,128,128,.35)',
+        'border-radius:6px',
+        'background:transparent',
+        'cursor:pointer',
+        'transition:background .15s,color .15s,border-color .15s,opacity .15s',
+        small ? 'font-size:11px;padding:2px 7px' : 'font-size:13px;padding:4px 12px'
+      ].join(';');
+      return b;
+    }
+
+    function activate(b) {
+      b.style.background = 'var(--bs-danger,#dc3545)';
+      b.style.color = '#fff';
+      b.style.borderColor = 'var(--bs-danger,#dc3545)';
+    }
+    function deactivate(b) {
+      b.style.background = 'transparent';
+      b.style.color = '';
+      b.style.borderColor = 'rgba(128,128,128,.35)';
+    }
+    function disable(b, off) {
+      b.disabled = off;
+      b.style.opacity = off ? '.38' : '1';
+      b.style.cursor = off ? 'not-allowed' : 'pointer';
+      b.style.pointerEvents = off ? 'none' : '';
+    }
+
+    function applyFilter() {
+      let f = '';
+      if (activeYear  !== '*') f += '.y-' + activeYear;
+      if (activeMonth !== '*') f += '.m-' + activeMonth;
+      if (activeDay   !== '*') f += '.d-' + activeDay;
+      iso.arrange({ filter: f || '*' });
+    }
+
+    function visibleMonths() {
+      return new Set(items
+        .filter(el => activeYear === '*' || el.dataset.year === activeYear)
+        .map(el => el.dataset.month));
+    }
+    function visibleDays() {
+      return new Set(items
+        .filter(el =>
+          (activeYear  === '*' || el.dataset.year  === activeYear) &&
+          (activeMonth === '*' || el.dataset.month === activeMonth))
+        .map(el => el.dataset.day));
+    }
+
+    /* ── Year row ── */
+    const yRow = makeRow('Year');
+    const allBtn = btn('All', false);
+    activate(allBtn);
+    yRow.appendChild(allBtn);
+
+    const yBtns = allYears.map(y => {
+      const b = btn(y, false);
+      yRow.appendChild(b);
+      return { b, y };
+    });
+
+      /* ── Month row ── */
+    const mRow = makeRow('Month');
+    const allMBtn = btn('All', true);
+    activate(allMBtn);
+    mRow.appendChild(allMBtn);
+
+    const mBtns = MONTHS.map((name, i) => {
+      const mm = String(i + 1).padStart(2, '0');
+      const b = btn(name, true);
+      disable(b, !allMonths.includes(mm));
+      mRow.appendChild(b);
+      return { b, mm };
+    });
+
+    /* ── Day row ── */
+    const dRow = makeRow('Day');
+    const allDBtn = btn('All', true);
+    activate(allDBtn);
+    dRow.appendChild(allDBtn);
+
+    const dBtns = Array.from({ length: 31 }, (_, i) => {
+      const dd = String(i + 1).padStart(2, '0');
+      const b = btn(dd, true);
+      disable(b, !allDays.includes(dd));
+      dRow.appendChild(b);
+      return { b, dd };
+    });
+
+    function refreshMonths() {
+      const vis = visibleMonths();
+      mBtns.forEach(({ b, mm }) => {
+        const has = vis.has(mm);
+        disable(b, !has);
+        if (!has && activeMonth === mm) { activeMonth = '*'; deactivate(b); }
+      });
+    }
+    function refreshDays() {
+      const vis = visibleDays();
+      dBtns.forEach(({ b, dd }) => {
+        const has = vis.has(dd);
+        disable(b, !has);
+        if (!has && activeDay === dd) { activeDay = '*'; deactivate(b); }
+      });
+    }
+
+    /* ── Handlers ── */
+    allBtn.addEventListener('click', () => {
+      activeYear = activeMonth = activeDay = '*';
+      activate(allBtn);
+      activate(allMBtn);
+      activate(allDBtn);
+      [...yBtns, ...mBtns, ...dBtns].forEach(({ b }) => deactivate(b));
+      refreshMonths(); refreshDays(); applyFilter();
+    });
+
+    yBtns.forEach(({ b, y }) => b.addEventListener('click', () => {
+      activeYear = y; activeMonth = '*'; activeDay = '*';
+      deactivate(allBtn);
+      yBtns.forEach(x => deactivate(x.b)); activate(b);
+      mBtns.forEach(({ b }) => deactivate(b));
+      dBtns.forEach(({ b }) => deactivate(b));
+      refreshMonths(); refreshDays(); applyFilter();
+    }));
+
+    allMBtn.addEventListener('click', () => {
+      activeMonth = '*';
+      activeDay = '*';
+      activate(allMBtn);
+      mBtns.forEach(x => deactivate(x.b));
+      allDBtn.style && activate(allDBtn);
+      dBtns.forEach(({ b }) => deactivate(b));
+      refreshDays(); applyFilter();
+    });
+
+    mBtns.forEach(({ b, mm }) => b.addEventListener('click', () => {
+      activeMonth = activeMonth === mm ? '*' : mm;
+      activeDay = '*';
+      mBtns.forEach(x => deactivate(x.b));
+      if (activeMonth !== '*') { activate(b); deactivate(allMBtn); }
+      else activate(allMBtn);
+      activate(allDBtn);
+      dBtns.forEach(({ b }) => deactivate(b));
+      refreshDays(); applyFilter();
+    }));
+
+    allDBtn.addEventListener('click', () => {
+      activeDay = '*';
+      activate(allDBtn);
+      dBtns.forEach(({ b }) => deactivate(b));
+      applyFilter();
+    });
+
+    dBtns.forEach(({ b, dd }) => b.addEventListener('click', () => {
+      activeDay = activeDay === dd ? '*' : dd;
+      dBtns.forEach(x => deactivate(x.b));
+      if (activeDay !== '*') { activate(b); deactivate(allDBtn); }
+      else activate(allDBtn);
+      applyFilter();
+    }));
+
+  });
+  </script>
+</body>
+</html>

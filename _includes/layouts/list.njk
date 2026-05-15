@@ -4,78 +4,171 @@
 {% include "components/head.njk" %}
 
 <body>
-  <!-- Timeline 6 - Bootstrap Brain Component -->
   <section class="bsb-timeline-6 py-3 py-md-5 py-xl-8">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-10 col-md-12 col-xl-10 col-xxl-9">
 
-	  <!-- Home dot at top of timeline -->
+          {# ── Build sorted collection ── #}
+          {% if collection %}
+            {% set sortedCollection = collections[collection] %}
+          {% else %}
+            {% if sort == "normal" %}
+              {% set sortedCollection = collections[target] %}
+            {% else %}
+              {% set sortedCollection = collections[target] | reverse %}
+            {% endif %}
+          {% endif %}
+
+          {# ── Collect unique years for the year row (dynamic) ── #}
+          {% set years = [] %}
+          {% for post in sortedCollection %}
+            {% set y = post.date | getYear %}
+            {% if y not in years %}{% set years = (years.push(y), years) %}{% endif %}
+          {% endfor %}
+
+          {# ── Resolve tag display name ── #}
+          {% set _tag = target or collection %}
+          {% if page.url == ("/" | url) %}
+            {% set pageLabel = "Latest" %}
+            {% set pageLabelClass = "tl-badge--latest" %}
+          {% elif _tag == "sdee" %}
+            {% set pageLabel = "S'DEE" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "jp" %}
+            {% set pageLabel = "JP" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "my" %}
+            {% set pageLabel = "MY" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "th" %}
+            {% set pageLabel = "TH" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "nxtstp" %}
+            {% set pageLabel = "NxtStp" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "viaflow" %}
+            {% set pageLabel = "ViaFlow" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag == "selfimprovement" %}
+            {% set pageLabel = "Self-Improvement" %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% elif _tag and _tag.startsWith("isbn_") %}
+            {% set pageLabel = "ISBN " + _tag.replace("isbn_", "") %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% else %}
+            {% set pageLabel = _tag %}
+            {% set pageLabelClass = "tl-badge--tag" %}
+          {% endif %}
+
+          {# ── Filter bar ── #}
+          <div class="tl-filter-bar mb-4">
+            <div class="tl-split">
+
+              {# Left: page label badge #}
+              <div class="tl-split__label">
+                <span class="tl-badge {{ pageLabelClass }}">{{ pageLabel }}</span>
+              </div>
+
+              {# Vertical rule #}
+              <div class="tl-split__rule"></div>
+
+              {# Right: Year / Month / Day filters #}
+              <div class="tl-split__filters">
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Year</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-year="*">All</button>
+                    {% for y in years | sort %}
+                      <button class="tl-btn tl-btn--available" data-year="{{ y }}">{{ y }}</button>
+                    {% endfor %}
+                  </div>
+                </div>
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Month</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-month="*">All</button>
+                    <button class="tl-btn tl-btn--available" data-month="01">Jan</button>
+                    <button class="tl-btn tl-btn--available" data-month="02">Feb</button>
+                    <button class="tl-btn tl-btn--available" data-month="03">Mar</button>
+                    <button class="tl-btn tl-btn--available" data-month="04">Apr</button>
+                    <button class="tl-btn tl-btn--available" data-month="05">May</button>
+                    <button class="tl-btn tl-btn--available" data-month="06">Jun</button>
+                    <button class="tl-btn tl-btn--available" data-month="07">Jul</button>
+                    <button class="tl-btn tl-btn--available" data-month="08">Aug</button>
+                    <button class="tl-btn tl-btn--available" data-month="09">Sep</button>
+                    <button class="tl-btn tl-btn--available" data-month="10">Oct</button>
+                    <button class="tl-btn tl-btn--available" data-month="11">Nov</button>
+                    <button class="tl-btn tl-btn--available" data-month="12">Dec</button>
+                  </div>
+                </div>
+
+                <div class="tl-filter-row">
+                  <span class="tl-filter-label">Day</span>
+                  <div class="tl-btn-group">
+                    <button class="tl-btn tl-btn--available active" data-day="*">All</button>
+                    {% for n in range(1, 32) %}
+                      <button class="tl-btn tl-btn--available" data-day="{{ n | pad2 }}">{{ n }}</button>
+                    {% endfor %}
+                  </div>
+                </div>
+
+              </div>{# /.tl-split__filters #}
+            </div>{# /.tl-split #}
+          </div>{# /.tl-filter-bar #}
+
+          <p class="tl-count mb-3" id="tl-count"></p>
+
+          {# ── Home dot ── #}
           <div style="position:relative; height:20px; margin-bottom:-10px;">
-            <a href="{{ '/' | url }}" class="tl-dot" aria-label="Home">
+            <a href="{{ '/' | url }}" class="tl-dot tl-dot--pulse" aria-label="Home">
               <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:4px;left:4px;">
                 <path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2z"/>
               </svg>
             </a>
           </div>
 
-	  {# ── Date filter bar ── #}
-	  <div id="tl-filters" style="margin-bottom:1.5rem;"></div>
-	  
           {% set zigzag = "left" %}
-          <ul class="timeline" id="tl-grid">
-	    
-	    {% if collection %}
-	    
-	      {% set sortedCollection = collections[collection] %}
-
-	    {% else %}
-	    
-	      {% if sort == "normal" %}
-                {% set sortedCollection = collections[target] %}
-              {% else %}
-                {% set sortedCollection = collections[target] | reverse %}
-              {% endif %}
-
-	    {% endif %}
-	    
+          <ul class="timeline" id="tl-list">
             {% for post in sortedCollection %}
+              {% set postDate  = post.date.toDateString() %}
+              {% set postTime  = post.date.toLocaleTimeString('en-US', { hour12: true }) %}
+              {% set postYear  = post.date | getYear %}
+              {% set postMonth = post.date | getMonth %}
+              {% set postDay   = post.date | getDay %}
 
-              {% set postDate = post.date.toDateString() %}
-              {% set postTime = post.date.toLocaleTimeString('en-US', { hour12: true}) %}
-
-	      {% set _y   = post.date.getFullYear() %}
-	      {% set _mmp = (post.date.getMonth() + 1) | pad2 %}
-	      {% set _ddp = post.date.getDate() | pad2 %}
-	      <li class="timeline-item {{ zigzag }} y-{{ _y }} m-{{ _mmp }} d-{{ _ddp }}"
-		  data-year="{{ _y }}"
-		  data-month="{{ _mmp }}"
-		  data-day="{{ _ddp }}">
-
-		<div class="timeline-body">
+              <li class="timeline-item {{ zigzag }} tl-item"
+                  data-year="{{ postYear }}"
+                  data-month="{{ postMonth }}"
+                  data-day="{{ postDay }}">
+                <div class="timeline-body">
                   <div class="timeline-content">
                     <div class="card border-0">
-                      <img class="card-img-top img-fluid" loading="lazy" src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
+                      <img class="card-img-top img-fluid" loading="lazy"
+                           src="{{ post.data.image }}" alt="{{ post.data.icaption }}">
                       <div class="card-body border border-top-0 border-light-subtle">
-                        <small class="text-muted text-right"><i>{% if (post.data.icaption) %}รูป: {{ post.data.icaption }}{% endif %}</i></small>
+                        <small class="text-muted text-right">
+                          <i>{% if post.data.icaption %}รูป: {{ post.data.icaption }}{% endif %}</i>
+                        </small>
                         <h2 class="card-title mb-2">{{ post.data.title }}</h2>
                         <h6 class="card-subtitle mb-2 text-secondary mb-3">{{ post.data.subtitle }}</h6>
-                        <p class="card-text mb-2">
-                          {{ post.content | safe }}
-                        </p>
+                        <p class="card-text mb-2">{{ post.content | safe }}</p>
                         <figure class="text-center">
                           <blockquote class="blockquote">
                             <p>{{ post.data.quote }}</p>
                           </blockquote>
                           <figcaption class="blockquote-footer">
-                            {{ post.data.qcaption }}<cite title="Source Title">{% if (post.data.cite) %}, {{ post.data.cite }}{% endif %}</cite>
+                            {{ post.data.qcaption }}
+                            <cite title="Source Title">{% if post.data.cite %}, {{ post.data.cite }}{% endif %}</cite>
                           </figcaption>
                         </figure>
                         <div class="card-footer">
                           <small>{{ postDate }} {{ postTime }}</small><br>
                           {% for tag in post.data.tags | sort %}
                             {% include "components/tags.njk" %}
-                          {% endfor %} <!-- tags -->
+                          {% endfor %}
                         </div>
                       </div>
                     </div>
@@ -83,21 +176,28 @@
                 </div>
               </li>
 
-	      {% if zigzag == "left" %}
+              {% if zigzag == "left" %}
                 {% set zigzag = "right" %}
               {% else %}
                 {% set zigzag = "left" %}
               {% endif %}
 
-            {% endfor %} <!-- sortedCollections -->
+            {% endfor %}
           </ul>
 
-          <!-- Back to top dot at end of timeline -->
+          {# ── No results message ── #}
+          <p class="tl-empty text-muted text-center py-4" id="tl-empty" style="display:none;">
+            No posts match this filter.
+          </p>
+
+          {# ── Back to top dot ── #}
           <div style="position:relative; height:20px; margin-top:-10px;">
-            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="tl-dot" aria-label="Back to top">
-	      <svg viewBox="0 0 16 16" width="10" height="10" fill="white" style="position:absolute;top:3px;left:4px;">
-		<path d="M8 3 L14 13 L2 13 Z"/>
-	      </svg>
+            <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;"
+               class="tl-dot tl-dot--pulse" aria-label="Back to top">
+              <svg viewBox="0 0 16 16" width="10" height="10" fill="white"
+                   style="position:absolute;top:3px;left:4px;">
+                <path d="M8 3 L14 13 L2 13 Z"/>
+              </svg>
             </a>
           </div>
 
@@ -107,10 +207,146 @@
   </section>
 
   <style>
-    @keyframes pulse {
-      0%   { box-shadow: 0 0 0 0 rgba(220,53,69,0.4); }
-      70%  { box-shadow: 0 0 0 8px rgba(220,53,69,0); }
-      100% { box-shadow: 0 0 0 0 rgba(220,53,69,0); }
+    html { scrollbar-gutter: stable; }
+    /* ══════════════════════════════════════════
+       Filter bar
+    ══════════════════════════════════════════ */
+    .tl-filter-bar {
+      background: var(--bs-body-bg);
+      border: 1px solid var(--bs-border-color);
+      border-radius: .75rem;
+      padding: .6rem .9rem;
+    }
+    .tl-split {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .tl-split__label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: .4rem .9rem .4rem .2rem;
+      flex-shrink: 0;
+    }
+    .tl-split__rule {
+      width: 1px;
+      background: var(--bs-border-color);
+      margin: .1rem .75rem .1rem 0;
+      flex-shrink: 0;
+    }
+    .tl-split__filters {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      padding: .4rem 0;
+    }
+    .tl-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    .tl-filter-label {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--bs-secondary-color);
+      min-width: 2.6rem;
+      flex-shrink: 0;
+    }
+    .tl-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    /* ══════════════════════════════════════════
+       Badge
+    ══════════════════════════════════════════ */
+    .tl-badge {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 99px;
+      line-height: 1.6;
+      letter-spacing: .03em;
+    }
+    .tl-badge--latest {
+      background: var(--bs-danger);
+      color: #fff;
+    }
+    .tl-badge--tag {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-secondary-color);
+      border: 1px solid var(--bs-border-color);
+    }
+
+    /* ══════════════════════════════════════════
+       Filter buttons
+    ══════════════════════════════════════════ */
+    .tl-btn {
+      font-size: .72rem;
+      padding: 2px 9px;
+      border-radius: 99px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s, opacity .12s;
+      line-height: 1.6;
+    }
+    .tl-btn--available {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-secondary-color);
+      border-color: var(--bs-border-color);
+    }
+    .tl-btn--available:hover {
+      background: var(--bs-tertiary-bg);
+      border-color: var(--bs-secondary-color);
+    }
+    .tl-btn--available.active {
+      background: var(--bs-secondary-color);
+      color: var(--bs-body-bg);
+      border-color: var(--bs-secondary-color);
+    }
+    .tl-btn--unavailable {
+      background: rgba(220, 53, 69, .06);
+      color: var(--bs-danger);
+      border-color: rgba(220, 53, 69, .2);
+      opacity: .45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       Count + empty
+    ══════════════════════════════════════════ */
+    .tl-count {
+      font-size: .82rem;
+      color: var(--bs-secondary-color);
+    }
+
+    /* ══════════════════════════════════════════
+       Hidden items — instant hide, no reflow gap
+    ══════════════════════════════════════════ */
+    .tl-item { transition: opacity .15s; }
+    .tl-item.tl-hidden { display: none; }
+
+    /* ══════════════════════════════════════════
+       Zigzag connector fix — re-applied via JS
+    ══════════════════════════════════════════ */
+    .timeline-item.left  { /* your existing left styles */ }
+    .timeline-item.right { /* your existing right styles */ }
+
+    /* ══════════════════════════════════════════
+       Timeline dots
+    ══════════════════════════════════════════ */
+    @keyframes tl-pulse {
+      0%   { box-shadow: 0 0 0 0   rgba(220,53,69,.45); }
+      70%  { box-shadow: 0 0 0 9px rgba(220,53,69,0);   }
+      100% { box-shadow: 0 0 0 0   rgba(220,53,69,0);   }
     }
     .tl-dot {
       display: block;
@@ -121,12 +357,14 @@
       border-radius: 50%;
       background: var(--bs-danger);
       z-index: 2;
-      cursor: pointer;
       transition: transform .2s, opacity .2s;
-      animation: pulse 2s infinite;
     }
-    .tl-dot:hover {
-      opacity: .75;
+    .tl-dot--pulse {
+      cursor: pointer;
+      animation: tl-pulse 2s ease-out infinite;
+    }
+    .tl-dot--pulse:hover {
+      opacity: .8;
       transform: scale(1.25);
       animation: none;
     }
@@ -135,205 +373,129 @@
     }
   </style>
 
-  <script src="https://cdn.jsdelivr.net/npm/isotope-layout@3.0.6/dist/isotope.pkgd.min.js"></script>
   <script>
-  window.addEventListener('load', function () {
-    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const items = Array.from(document.querySelectorAll('#tl-grid .timeline-item[data-year]'));
-    if (!items.length) return;
+    (function () {
+      let activeYear  = "*";
+      let activeMonth = "*";
+      let activeDay   = "*";
 
+      const items   = Array.from(document.querySelectorAll(".tl-item"));
+      const countEl = document.getElementById("tl-count");
+      const emptyEl = document.getElementById("tl-empty");
+      const total   = items.length;
 
-    const allYears  = [...new Set(items.map(el => el.dataset.year))].sort();
-    const allMonths = [...new Set(items.map(el => el.dataset.month))].sort();
-    const allDays   = [...new Set(items.map(el => el.dataset.day))].sort();
+      /* ── Reapply left/right alternation on visible items ── */
+      function reZigzag() {
+        const visible = items.filter(function (el) {
+          return !el.classList.contains("tl-hidden");
+        });
+        visible.forEach(function (el, i) {
+          el.classList.remove("left", "right");
+          el.classList.add(i % 2 === 0 ? "left" : "right");
+        });
+      }
 
-    let activeYear = '*', activeMonth = '*', activeDay = '*';
+      function countIfSet(axis, value) {
+        let n = 0;
+        items.forEach(function (item) {
+          const y = axis === "year"  ? value : activeYear;
+          const m = axis === "month" ? value : activeMonth;
+          const d = axis === "day"   ? value : activeDay;
+          if (
+            (y === "*" || item.dataset.year  === y) &&
+            (m === "*" || item.dataset.month === m) &&
+            (d === "*" || item.dataset.day   === d)
+          ) n++;
+        });
+        return n;
+      }
 
-    const iso = new Isotope('#tl-grid', {
-      itemSelector: '.timeline-item',
-      layoutMode: 'vertical'
-    });
+      function updateButtonAvailability() {
+        [
+          { sel: ".tl-btn[data-year]",  axis: "year"  },
+          { sel: ".tl-btn[data-month]", axis: "month" },
+          { sel: ".tl-btn[data-day]",   axis: "day"   },
+        ].forEach(function (group) {
+          document.querySelectorAll(group.sel).forEach(function (btn) {
+            const val = btn.dataset[group.axis];
+            /* All buttons are always available */
+            if (val === "*") return;
+            const empty = countIfSet(group.axis, val) === 0;
+            btn.disabled = empty;
+            if (empty) {
+              btn.classList.remove("tl-btn--available");
+              btn.classList.add("tl-btn--unavailable");
+            } else {
+              btn.classList.remove("tl-btn--unavailable");
+              btn.classList.add("tl-btn--available");
+            }
+          });
+        });
+      }
 
-    const wrap = document.getElementById('tl-filters');
+      function updateCount(visible) {
+        countEl.textContent = visible === total
+          ? "Showing all " + total + " posts"
+          : "Showing " + visible + " of " + total + " posts";
+        emptyEl.style.display = visible === 0 ? "block" : "none";
+      }
 
-    function makeRow(label) {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px';
-      const lbl = document.createElement('span');
-      lbl.textContent = label;
-      lbl.style.cssText = 'font-size:11px;font-weight:600;min-width:46px;letter-spacing:.06em;opacity:.55;text-transform:uppercase';
-      const sep = document.createElement('div');
-      sep.style.cssText = 'width:1px;height:18px;background:rgba(128,128,128,.25);margin:0 2px';
-      const inner = document.createElement('div');
-      inner.style.cssText = 'display:flex;gap:5px;flex-wrap:wrap';
-      row.append(lbl, sep, inner);
-      wrap.appendChild(row);
-      return inner;
-    }
+      function applyFilter() {
+        let visible = 0;
+        items.forEach(function (item) {
+          const show =
+            (activeYear  === "*" || item.dataset.year  === activeYear)  &&
+            (activeMonth === "*" || item.dataset.month === activeMonth) &&
+            (activeDay   === "*" || item.dataset.day   === activeDay);
+          item.classList.toggle("tl-hidden", !show);
+          if (show) visible++;
+        });
+        reZigzag();
+        updateCount(visible);
+        updateButtonAvailability();
+      }
 
-    function btn(text, small) {
-      const b = document.createElement('button');
-      b.textContent = text;
-      b.style.cssText = [
-        'border:.5px solid rgba(128,128,128,.35)',
-        'border-radius:6px',
-        'background:transparent',
-        'cursor:pointer',
-        'transition:background .15s,color .15s,border-color .15s,opacity .15s',
-        small ? 'font-size:11px;padding:2px 7px' : 'font-size:13px;padding:4px 12px'
-      ].join(';');
-      return b;
-    }
+	function resetMonths() {
+	  document.querySelectorAll(".tl-btn[data-month]").forEach(function (b) { b.classList.remove("active"); });
+	  document.querySelector(".tl-btn[data-month='*']").classList.add("active");
+	  activeMonth = "*";
+	}
+	function resetDays() {
+	  document.querySelectorAll(".tl-btn[data-day]").forEach(function (b) { b.classList.remove("active"); });
+	  document.querySelector(".tl-btn[data-day='*']").classList.add("active");
+	  activeDay = "*";
+	}
 
-    function activate(b) {
-      b.style.background = 'var(--bs-danger,#dc3545)';
-      b.style.color = '#fff';
-      b.style.borderColor = 'var(--bs-danger,#dc3545)';
-    }
-    function deactivate(b) {
-      b.style.background = 'transparent';
-      b.style.color = '';
-      b.style.borderColor = 'rgba(128,128,128,.35)';
-    }
-    function disable(b, off) {
-      b.disabled = off;
-      b.style.opacity = off ? '.38' : '1';
-      b.style.cursor = off ? 'not-allowed' : 'pointer';
-      b.style.pointerEvents = off ? 'none' : '';
-    }
+	function bindGroup(selector, stateKey) {
+	  document.querySelectorAll(selector).forEach(function (btn) {
+	    btn.addEventListener("click", function () {
+	      if (this.disabled) return;
+	      document.querySelectorAll(selector).forEach(function (b) {
+		b.classList.remove("active");
+	      });
+	      this.classList.add("active");
+	      if (stateKey === "year") {
+		activeYear = this.dataset.year;
+		resetMonths();
+		resetDays();
+	      }
+	      if (stateKey === "month") {
+		activeMonth = this.dataset.month;
+		resetDays();
+	      }
+	      if (stateKey === "day") activeDay = this.dataset.day;
+	      applyFilter();
+	    });
+	  });
+	}
 
-    function applyFilter() {
-      let f = '';
-      if (activeYear  !== '*') f += '.y-' + activeYear;
-      if (activeMonth !== '*') f += '.m-' + activeMonth;
-      if (activeDay   !== '*') f += '.d-' + activeDay;
-      iso.arrange({ filter: f || '*' });
-    }
+      bindGroup("[data-year]",  "year");
+      bindGroup("[data-month]", "month");
+      bindGroup("[data-day]",   "day");
 
-    function visibleMonths() {
-      return new Set(items
-        .filter(el => activeYear === '*' || el.dataset.year === activeYear)
-        .map(el => el.dataset.month));
-    }
-    function visibleDays() {
-      return new Set(items
-        .filter(el =>
-          (activeYear  === '*' || el.dataset.year  === activeYear) &&
-          (activeMonth === '*' || el.dataset.month === activeMonth))
-        .map(el => el.dataset.day));
-    }
-
-    /* ── Year row ── */
-    const yRow = makeRow('Year');
-    const allBtn = btn('All', false);
-    activate(allBtn);
-    yRow.appendChild(allBtn);
-
-    const yBtns = allYears.map(y => {
-      const b = btn(y, false);
-      yRow.appendChild(b);
-      return { b, y };
-    });
-
-      /* ── Month row ── */
-    const mRow = makeRow('Month');
-    const allMBtn = btn('All', true);
-    activate(allMBtn);
-    mRow.appendChild(allMBtn);
-
-    const mBtns = MONTHS.map((name, i) => {
-      const mm = String(i + 1).padStart(2, '0');
-      const b = btn(name, true);
-      disable(b, !allMonths.includes(mm));
-      mRow.appendChild(b);
-      return { b, mm };
-    });
-
-    /* ── Day row ── */
-    const dRow = makeRow('Day');
-    const allDBtn = btn('All', true);
-    activate(allDBtn);
-    dRow.appendChild(allDBtn);
-
-    const dBtns = Array.from({ length: 31 }, (_, i) => {
-      const dd = String(i + 1).padStart(2, '0');
-      const b = btn(dd, true);
-      disable(b, !allDays.includes(dd));
-      dRow.appendChild(b);
-      return { b, dd };
-    });
-
-    function refreshMonths() {
-      const vis = visibleMonths();
-      mBtns.forEach(({ b, mm }) => {
-        const has = vis.has(mm);
-        disable(b, !has);
-        if (!has && activeMonth === mm) { activeMonth = '*'; deactivate(b); }
-      });
-    }
-    function refreshDays() {
-      const vis = visibleDays();
-      dBtns.forEach(({ b, dd }) => {
-        const has = vis.has(dd);
-        disable(b, !has);
-        if (!has && activeDay === dd) { activeDay = '*'; deactivate(b); }
-      });
-    }
-
-    /* ── Handlers ── */
-    allBtn.addEventListener('click', () => {
-      activeYear = activeMonth = activeDay = '*';
-      activate(allBtn);
-      [...yBtns, ...mBtns, ...dBtns].forEach(({ b }) => deactivate(b));
-      refreshMonths(); refreshDays(); applyFilter();
-    });
-
-    yBtns.forEach(({ b, y }) => b.addEventListener('click', () => {
-      activeYear = y; activeMonth = '*'; activeDay = '*';
-      deactivate(allBtn);
-      yBtns.forEach(x => deactivate(x.b)); activate(b);
-      mBtns.forEach(({ b }) => deactivate(b));
-      dBtns.forEach(({ b }) => deactivate(b));
-      refreshMonths(); refreshDays(); applyFilter();
-    }));
-
-    allMBtn.addEventListener('click', () => {
-      activeMonth = '*';
-      activeDay = '*';
-      activate(allMBtn);
-      mBtns.forEach(x => deactivate(x.b));
-      allDBtn.style && activate(allDBtn);
-      dBtns.forEach(({ b }) => deactivate(b));
-      refreshDays(); applyFilter();
-    });
-
-    mBtns.forEach(({ b, mm }) => b.addEventListener('click', () => {
-      activeMonth = activeMonth === mm ? '*' : mm;
-      activeDay = '*';
-      mBtns.forEach(x => deactivate(x.b));
-      if (activeMonth !== '*') { activate(b); deactivate(allMBtn); }
-      else activate(allMBtn);
-      activate(allDBtn);
-      dBtns.forEach(({ b }) => deactivate(b));
-      refreshDays(); applyFilter();
-    }));
-
-    allDBtn.addEventListener('click', () => {
-      activeDay = '*';
-      activate(allDBtn);
-      dBtns.forEach(({ b }) => deactivate(b));
       applyFilter();
-    });
-
-    dBtns.forEach(({ b, dd }) => b.addEventListener('click', () => {
-      activeDay = activeDay === dd ? '*' : dd;
-      dBtns.forEach(x => deactivate(x.b));
-      if (activeDay !== '*') { activate(b); deactivate(allDBtn); }
-      else activate(allDBtn);
-      applyFilter();
-    }));
-
-  });
+    })();
   </script>
+
 </body>
 </html>
