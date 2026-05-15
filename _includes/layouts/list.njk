@@ -219,8 +219,8 @@
     }
     .tl-split {
       display: flex;
-      align-items: stretch;
-      gap: 0;
+      flex-direction: column;
+      gap: .5rem;
     }
     .tl-split__label {
       display: flex;
@@ -230,10 +230,7 @@
       flex-shrink: 0;
     }
     .tl-split__rule {
-      width: 1px;
-      background: var(--bs-border-color);
-      margin: .1rem .75rem .1rem 0;
-      flex-shrink: 0;
+      display: none;
     }
     .tl-split__filters {
       flex: 1;
@@ -370,6 +367,20 @@
     }
     @media (min-width: 768px) {
       .tl-dot { left: calc(50% - 9px); }
+    }
+    @media (min-width: 576px) {
+      .tl-split {
+	flex-direction: row;
+	align-items: stretch;
+	gap: 0;
+      }
+      .tl-split__rule {
+	display: block;
+	width: 1px;
+	background: var(--bs-border-color);
+	margin: .1rem .75rem .1rem 0;
+	flex-shrink: 0;
+      }
     }
   </style>
 
